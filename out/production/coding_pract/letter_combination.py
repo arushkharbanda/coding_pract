@@ -3,7 +3,7 @@ def letterCombinations(digits: str):
 
 
     '''
-    digitMap={}
+    digitMap=%d
     start=ord('a')
     for k in range (2,10):
         if k ==7 or k==9:
