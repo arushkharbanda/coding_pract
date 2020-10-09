@@ -1,10 +1,23 @@
 
 def twoSum( nums, target: int):
     # Assuming that nums is not empty
-    for i in range(0,len(nums)):
-        for j in range(i+1,len(nums)):
-            if nums[i]+nums[j]==target:
-                return [i,j]
+    i=0
+    j=len(nums)-1
+    nums2=nums.copy()
+    nums.sort()
+    while(i<j):
+        sum=nums[i]+nums[j]
+        if sum==target:
+            a=nums[i]
+            b=nums[j]
+            break
+        elif sum>target:
+            j=j-1
+        elif sum<target:
+            i=i+1
+    ioa=nums2.index(a)
+    iob=[i for i,x in enumerate(nums2) if x==b and i!=ioa ][0]
+    return [ioa,iob]
 
 
 
