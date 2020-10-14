@@ -1,22 +1,39 @@
 import heapq
-class KthLargest:
+from util import check
 
+class KthLargest:
     def __init__(self, k: int, nums):
         self.k=k
         heapq.heapify(nums)
         self.h=nums
-        #print(self.h)
+        while(len(self.h)>self.k):
+            heapq.heappop(self.h)
 
 
     def add(self, val: int):
-        heapq.heappush(val)
+        if len(self.h)<self.k:
+            heapq.heappush(self.h,val)
+        elif len(self.h)>=self.k:
+            if val>self.h[0]:
+                heapq.heappush(self.h,val)
+                while(len(self.h)>self.k):
+                    heapq.heappop(self.h)
+        return self.h[0]
+
 
 sol=KthLargest(3, [4, 5, 8, 2])
-#assert(sol.add(3)==4)
-#assert(sol.add(5)==5)
-#assert(sol.add(10)==5)
-#assert(sol.add(9)==8)
-#assert(sol.add(4)==8)
+
+check([3],4,sol.add)
+check([5],5,sol.add)
+check([10],5,sol.add)
+check([9],8,sol.add)
+check([4],8,sol.add)
 
 
-#print("input-{} expected-{} output-{}".format(,[None, 4, 5, 5, 8, 8],))
+sol=KthLargest(3, [5,-1])
+
+check([2],-1,sol.add)
+check([1],1,sol.add)
+check([-1],1,sol.add)
+check([3],2,sol.add)
+check([4],3,sol.add)
