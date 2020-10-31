@@ -58,7 +58,7 @@ l23=ListNode(4,None)
 l22=ListNode(6,l23)
 l21=ListNode(5,l22)
 
-#print("output {} expected {}".format(str_list(addTwoNumbers(l11,l21)),342+465))
+print("output {} expected {}".format(str_list(addTwoNumbers(l11,l21)),342+465))
 
 #81 +0
 head1=ListNode(1)

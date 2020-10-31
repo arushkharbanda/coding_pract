@@ -1,24 +1,35 @@
 from util import check
-import heapq
 class Solution:
-    def trap(self, input):
-        if len(input)<2:
-            return 0
-        h=[(-1*hei, i) for i,hei in enumerate(input)]
-        heapq.heapify(h)
-        no1,no1_i=heapq.heappop(h)
-        no2,no2_i=heapq.heappop(h)
-        no1=no1*-1
-        no2=no2*-1
-        left=min(no1_i,no2_i)
-        right=max(no1_i,no2_i)
-        height=min(no1, no2)
-        width=right-left-1
-        prefilled_arr=[min(x,height) for x in input[left+1:right]]
-        pre_filled_volume=sum(prefilled_arr)
-        volume=(height*width)-pre_filled_volume
-        return volume+self.trap(input[0:left+1])+self.trap(input[right:])
+    def trap(self, height: List[int]) -> int:
+        water = 0
+        l = 0
+        for r in range(len(height)):
+            if height[r] >= height[l] and r == l + 1:
+                l = r
+            elif height[r] >= height[l] and r != l:
+                water += pool_calc(height, l, r)
+                l = r
 
+        height = height[::-1]
+        r = l
+        l = 0
+        for r in range(len(height)-r):
+            if height[r] >= height[l] and r == l + 1:
+                l = r
+            elif height[r] >= height[l] and r != l:
+                water += pool_calc(height, l, r)
+                l = r
+        return water
+
+def pool_calc(height, l, r):
+    w_height = min(height[l], height[r])
+    l += 1
+    water = 0
+    while l < r:
+        water += w_height - height[l]
+        l += 1
+
+    return water
 sol=Solution()
 check([[4,2,0,3,2,5]],[9], sol.trap)
 check([[0,1,0,2,1,0,1,3,2,1,2,1]],[6], sol.trap)

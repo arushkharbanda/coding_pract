@@ -1,15 +1,10 @@
 from datetime import datetime
 from math import floor
-
-#verbose=True
-verbose=False
-def debug(msg):
-    if verbose:
-        print(msg)
+from util import check
 
 class Solution:
 
-    # handles .
+    # . case
     def match(self,s,p):
         if p==".":
             return True
@@ -17,69 +12,71 @@ class Solution:
             return True
         return False
 
+    def isMatch_old(self, s: str, p: str) -> bool:
+        s1=[]
+        s2=[]
+        s1.extend(s)
+        s2.extend(p)
+        while len(s1)>0 or len(s2)>0:
+            if len(s2)>0:
+                ele=s2.pop()
+            elif len(s1)==0 or len(s2)==0:
+                return False
 
-    def isMatch(self, s: str, p: str) -> bool:
-        strPos=len(s)-1;
-        regexPos=len(p)-1;
+            # * case
+            if ele=='*':
+                e=s2.pop()
+                while True:
+                    if len(s1)>0:
+                        last=s1[-1]
+                        if not self.match(last,e):
+                            break
+                        else:
+                            s1.pop()
+                    else:
+                        break
 
-        while(strPos>=0 or regexPos>=0 ):
-            # Reverse Traversal over regex and on demand over string
-            if(regexPos<0):
-                return False;
 
-            if(strPos<0):
-                return False;
-            regex=p[regexPos]
-            str=s[strPos]
-
-
-            # handles *
-            if (regex=='*'):
-                regexstringtoToMatch=p[regexPos-1]
-                #debug("Matching string {} against regex {} result {}".format(str,regexstringtoToMatch, self.match(str,regexstringtoToMatch)))
-                if self.match(str,regexstringtoToMatch):
-                    debug("Matched string {} against regex {} result {}".format(str,regexstringtoToMatch, self.match(str,regexstringtoToMatch)))
-                    strPos=strPos-1
-                    if strPos==-1 and regexPos==1:
-                        return True;
-                    continue
-                else:
-                    regexPos=regexPos-2
-                    continue
             else:
-                regexPos=regexPos-1
-            strPos=strPos-1
-
-            debug("Matching string {} against regex {} result {}".format(str,regex, self.match(str, regex)))
-
-            if not self.match(str, regex):
-                return False
-            if (regexPos==-1 ) ^ (strPos==-1 ):
-                return False
-
-
-
+                if len(s1)>0:
+                    e2=s1.pop()
+                else:
+                    return False
+                if not self.match(e2,ele):
+                    return False
         return True
 
+    def isMatch(self, s, p):
+        if not s and not p:
+            return True
+
+        if not p and s:
+            return False
+
+        if p[-1] == '*':
+            rep = p[-2]
+            if s and (s[-1] == rep or rep == '.'):
+                return self.isMatch(s[:-1], p) or self.isMatch(s, p[:-2])
+            else:
+                return self.isMatch(s, p[:-2])
+        else:
+            if s and (p[-1] == s[-1] or p[-1] == '.'):
+                return self.isMatch(s[:-1], p[:-1])
+            else:
+                return False
+
+
 sol=Solution()
+check(["aa","a"],[False], sol.isMatch)
+check(["aa","a*"],[True], sol.isMatch)
+check(["ab",".*"],[True], sol.isMatch)
+check(["aab","c*a*b"],[True], sol.isMatch)
+check(["mississippi","mis*is*p*."],[False], sol.isMatch)
+check(["mississippi","mis*is*ip*."],[True], sol.isMatch)
+check(["abcd","d*"],[False], sol.isMatch)
+check(["abc","0abc"],[False], sol.isMatch)
+check(["a",".*..a*"],[False], sol.isMatch)
+check(["aaa","ab*a*c*a"],[True], sol.isMatch)
 
-def check(a,b,c):
-    dt = datetime.now()
-    start=dt.microsecond
-    output=sol.isMatch(a, b)
-    dt = datetime.now()
-    end=dt.microsecond
-    print("output {} for {}-{} expected {} took time {}".format(output,a,b,c,(end-start)))
-    #assert(output==c)
 
-
-#check("aa","a",False)
-#check("aa","a*",True)
-#check("ab",".*",True)
-check("aab","c*a*b",True)
-#check("mississippi","mis*is*p*.",False)
-#check("mississippi","mis*is*ip*.",True)
-#check("abcd","d*",False)
-#check("abc","0abc",False)
-#check("a",".*..a*",False)
 
