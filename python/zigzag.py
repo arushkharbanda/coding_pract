@@ -28,9 +28,11 @@ class Solution:
 
             ansArrs[stack]=ansArrs[stack]+s[j]
             #debug("Adding {} Current Arrays {}".format(s[j],ansArrs))
+        '''
         for k in range(0, len(ansArrs)):
             ans=ans+"".join(ansArrs[k])
-        return ans
+        '''
+        return "".join(ansArrs)
 
 
 

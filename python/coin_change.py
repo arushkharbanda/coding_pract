@@ -1,41 +1,38 @@
 from util import check
 import math
-import sys
-from collections import deque
 
 class Solution:
-    def coinChange(self, coins, amount: int) -> int:
-        s=deque()
+    def coinChange_new(self, coins, amount):
         coins.sort(reverse=True)
-        min_coin=coins[0]
-        # steps, sum and list
-        s.append((0, 0,[]))
-        if amount==0:
-            return 0
-        while s:
-            steps,old_sum, coin_list=s.popleft()
-            #print("got sum {}, steps {} and list {} from stack".format(old_sum,steps,coin_list))
-            steps=steps+1
-            for coin in coins:
-                new_sum=old_sum+coin
-                new_coin_list=coin_list.copy()
-                new_coin_list.append(coin)
-                if new_sum<=amount-min_coin:
-                    s.append((steps,new_sum,  new_coin_list))
-                if new_sum==amount:
-                    #print("list {}".format(new_coin_list))
-                    return steps
+        self.min_length=math.inf
+        # (no of coins used so far, amount to make, using coins, coin list)
+        self.coinChange_rec(0,amount, coins)
+        return  self.min_length if not self.min_length==math.inf else -1
 
-        return -1
+    def coinChange_rec(self, count, amount, coins):
+        if len(coins)==0:
+            return
+        poss=amount//coins[0]
+        if amount%coins[0]==0:
+            self.min_length=min(count+poss,self.min_length)
 
-    def coinChange_new(self, coins, amount: int) -> int:
+        for p in range(poss,-1,-1):
+            if count+p<self.min_length:
+                self.coinChange_rec(count+p,amount-p*coins[0],coins[1:])
+            else:
+                break
+        return self.min_length
 
-            self.ans = float('inf')
 
-            # Start searching from the biggest coin
-            coins.sort(reverse=True)
-            self.dfs(coins, amount, 0)
-            return -1 if self.ans == float('inf') else self.ans
+
+    def coinChange(self, coins, amount: int) -> int:
+
+        self.ans = float('inf')
+
+        # Start searching from the biggest coin
+        coins.sort(reverse=True)
+        self.dfs(coins, amount, 0)
+        return -1 if self.ans == float('inf') else self.ans
 
 
     def dfs(self, coins, amount, prev_count):
@@ -65,15 +62,16 @@ class Solution:
                 self.dfs(coins[1:], amount - k * coins[0], prev_count + k)
 
 
-
-
 sol=Solution()
 check([[1,2,5], 11], [3], sol.coinChange_new)
-#check([[1,2,3], 5], [2], sol.coinChange)
-#check([[1,2,3], 11], [4], sol.coinChange)
-#check([[2], 3], [-1], sol.coinChange)
-#check([[1], 0], [0], sol.coinChange)
-#check([[1,2,5], 100], [20], sol.coinChange_new)
-#check([[2,5,10,1], 27], [4], sol.coinChange_new)
-#check([[186,419,83,408], 6249], [20], sol.coinChange_new)
-
+check([[1,2,3], 5], [2], sol.coinChange_new)
+check([[1,2,3], 11], [4], sol.coinChange_new)
+check([[2], 3], [-1], sol.coinChange_new)
+check([[1], 0], [0], sol.coinChange_new)
+check([[1,2,5], 100], [20], sol.coinChange_new)
+check([[2,5,10,1], 27], [4], sol.coinChange_new)
+check([[186,419,83,408], 6249], [20], sol.coinChange_new)
+check([[3,7,405,436], 8839], [25], sol.coinChange_new)
+check([[470,35,120,81,121], 9825], [30], sol.coinChange_new)
+check([[346,29,395,188,155,109], 9401], [26], sol.coinChange_new)
+check([[470,18,66,301,403,112,360], 8235], [20], sol.coinChange_new)

@@ -1,63 +1,74 @@
 from util import check
-from collections import defaultdict
-import re
 from collections import deque
-import collections
 class Solution:
-
-    def compileMapping(self, wordList):
+    def createTrie(self, wordList):
+        t={}
+        self.END='__END__'
         for word in wordList:
-            for i in range(len(word)):
-                before=word[:i]
-                after=word[i+1:]
-                key=before+'*'+after
-                if key in self.mapping.keys():
-                    self.mapping[key].append(word)
-                else:
-                    self.mapping[key]=[word]
+            current=t
+            for letter in word:
+                if letter not  in current:
+                    current[letter]={}
+                current=current[letter]
+            current[self.END]=word
+        return t
 
-    def getNeighbours(self, word):
-        if word in self.m.keys():
-            return self.m[word]
-        else:
-            self.m[word]=[]
-            for i in range(len(word)):
-                before=word[0:i]
-                after=word[i+1:]
-                key=before+"*"+after
-                self.m[word].extend(self.mapping[key])
-
-            return self.m[word]
-
-    def ladderLength(self, beginWord: str, endWord: str, wordList):
-        q=deque()
-        result=[]
-        self.mapping={}
-        self.m={}
-        if beginWord not in wordList:
-            wordList.append(beginWord)
-        traversed={word:0 for word in wordList}
-        self.compileMapping(wordList)
-
-        q.append((1,beginWord,[beginWord]))
-        while len(q)>0:
-            distance,ele, path=q.popleft();
-            traversed[ele]=1
-
-            neighbours=self.getNeighbours(ele)
-            if endWord in neighbours:
-                path.append(endWord)
-                if len(result)==0 or (len(result)>0 and len(result[0])==len(path)):
-                    result.append(path)
+    def hasWord(self, t, word):
+        current=t
+        for letter in word:
+            if letter in current:
+                current=current[letter]
             else:
-                for neighbour in neighbours:
-                    if traversed[neighbour]!=1:
-                        new_path=path.copy()
-                        new_path.append(neighbour)
-                        q.append((distance+1,neighbour, new_path))
+                return False
+        if self.END in current:
+            return True
+        return False
+
+
+    def getSimilar(self,t, word):
+        if word in self.cache:
+            return self.cache[word]
+        else:
+            result=self.getSimilar_rec(t,word)
+            self.cache[word]=result
+            return result
+
+    def getSimilar_rec(self,t, word):
+        self.wildchar='*'
+        result=[]
+        current=t
+        for i,letter in enumerate(word):
+            if letter==self.wildchar:
+                for key in current.keys():
+                    result.extend(self.getSimilar_rec(current[key], word[i+1:] ))
+            elif letter in current:
+                current=current[letter]
+            else:
+                return result
+        if self.END in current:
+            result.append(current[self.END])
+            del current[self.END]
         return result
 
+    def ladderLength(self, beginWord: str, endWord: str, wordList):
+        self.t=self.createTrie(wordList)
+        self.cache={}
+        s=deque()
+        s.append((1, beginWord))
+        traversed={}
+        while s:
+            depth, ele=s.popleft()
+            for i,letter in enumerate(ele):
+                newWord=ele[:i]+"*"+ele[i+1:]
+                children=self.getSimilar(self.t,newWord)
+                for child in children:
+                    if child==endWord:
+                        return depth+1
+                    if child not in traversed:
+                        traversed[child] = True
+                        s.append((depth+1,child))
+        return 0
+
 sol=Solution()
-check(["hit","cog",["hot","dot","dog","lot","log","cog"]],[[["hit","hot","dot","dog","cog"],
-                                                            ["hit","hot","lot","log","cog"]]],sol.ladderLength)
-check(["hit","cog",["hot","dot","dog","lot","log"]],[[]],sol.ladderLength)
+check(["hit","cog",["hot","dot","dog","lot","log","cog"]],[5],sol.ladderLength)
+check(["hit","cog",["hot","dot","dog","lot","log"]],[0],sol.ladderLength)
